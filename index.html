@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Bootstrapped Capital One Bike Analyzer</title>
+  <meta name="viewport" content="width = device-width, initial-scale = 1.0">
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+  <script type="text/javascript">
+    $.ajax({
+      url: 'csvParser/processed.csv',
+      dataType: 'text',
+    }).done(process);
+
+    function process(data) {
+      console.log(data);
+      var text = data.split(",");
+
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(function(){drawGraph1(text), drawGraph2(text), drawGraph3(text)});
+
+
+      document.getElementById('pop').innerHTML = "The most popular station to start at was " + text[0] + " and the most popular to end at was " + text[1] + "."
+      document.getElementById('avg').innerHTML = "The average distance biked was " + text[2] + ". Please note Haversine distance was not computed."
+      document.getElementById('reg').innerHTML = "The number of regular bikers (non-Walkup) was " + text[3] + "."
+
+    }
+
+    function drawGraph1(text) {
+      var table = new google.visualization.DataTable();
+      table.addColumn('string', 'Trip Route Category-Passholder type combinations');
+      table.addColumn('number', 'Frequency');
+      table.addRows([
+        ['Round Trip Walk-up', Number(text[4])],
+        ['Round Trip Monthly Pass', Number(text[5])],
+        ['One Way Staff Annual', Number(text[6])],
+        ['One Way Flex Pass', Number(text[7])],
+        ['Round Trip Flex Pass', Number(text[8])],
+        ['Round Trip Staff Annual', Number(text[9])],
+        ['One Way Monthly Pass', Number(text[10])],
+        ['One Way Walk-up', Number(text[11])]
+      ]);
+      var attributes = {'title':'Trip Route Category-Passholder type combinations',
+                     'width':800,
+                     'height':300};
+
+      var chart = new google.visualization.PieChart(document.getElementById('graph1'));
+      chart.draw(table, attributes);
+    }
+
+    function drawGraph2(text) {
+      var table = new google.visualization.arrayToDataTable([
+        ['Trip Route', 'Count', { role: 'style'}],
+        ['Round Trip', Number(text[12]), 'color: #4071c4'],
+        ['One Way', Number(text[13]), 'color: #383888']
+      ]);
+      var attributes = {'title':'Trip Route Category Distribution: Morning',
+                     'width':800,
+                     'height':300,
+                     bar: {groupWidth: "50%"},
+                     legend: { position: "none" },
+                     hAxis: {viewWindow: {min: 0, max: 100000}}
+                   };
+      var chart = new google.visualization.BarChart(document.getElementById('graph2'));
+      chart.draw(table, attributes);
+    }
+
+    function drawGraph3(text) {
+      var table = new google.visualization.arrayToDataTable([
+        ['Trip Route', 'Count', { role: 'style'}],
+        ['Round Trip', Number(text[14]), 'color: #4071c4'],
+        ['One Way', Number(text[15]), 'color: #383888']
+      ]);
+      var attributes = {'title':'Trip Route Category Distribution: Afternoon',
+                     'width':800,
+                     'height':300,
+                     bar: {groupWidth: "50%"},
+                     legend: { position: "none" },
+                     hAxis: {viewWindow: {min: 0, max: 100000}}
+                   };
+      var chart = new google.visualization.BarChart(document.getElementById('graph3'));
+      chart.draw(table, attributes);
+    }
+
+  </script>
+
+</head>
+
+
+<body>
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="https://code.jquery.com/jquery.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+
+  <div class="container">
+
+  <div class="row" >
+    <div class = "col-md-12">
+      <h1>Bike Share Analysis</h1>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class = "col-md-12">
+      <p class="lead">An analysis of bike share data given from Capital One (by Ahmed Lone, University of Pennsylvania). Data visualized using Google Charts, processed using custom Java program.</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class = "col-md-12">
+      <h4>Data Visualization</h4>
+    </div>
+  </div>
+
+
+  <div class="row">
+    <div class = "col-12" id = "graph1">
+      <p>Graph1</p>
+    </div>
+    <div class = "col-6" id = "graph2">
+      <p>Graph2</p>
+    </div>
+    <div class = "col-12" id = "graph3">
+      <p>Graph3</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class = "col-md-12">
+      <h4>Facts & Figures</h4>
+      <ul>
+        <li id="pop">Popular</li>
+        <li id="avg">Average Distance</li>
+        <li id="reg">Regular Bikers</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class = "col-md-12">
+      <h4>Discussion of Results</h4>
+      <p> There's a lot of information to unpack here. It's interesting to see that far and away the most common user
+      here was a One Way Monthly Pass User, though this isn't really unexpected as they are those who likely expected to
+    see the most value out of use. It would be interesting to adjust bike use by user to get a better view of the market though I don't
+  believe this data was provided. As expected, afternoons saw more use, though perhaps unexpectedly, the ratio of round trips and one way trips didn't
+change, though I expected fewer round trips in the morning from work/school commutes. Average distance was unfortunately computed using latitude and longitude, and
+judging from the MindSumo comments, computing Haversine Distance seemed to be implied to be a bit excessive, and so I hope you all have a more intuitive sense for
+the scale of that value. Either way, this was a pretty fun assignment, and I hope this might be useful to someone else!</p>
+    </div>
+  </div>
+
+  </div>
+
+
+</body>
+
+</html>
